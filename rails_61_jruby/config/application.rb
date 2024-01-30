@@ -8,6 +8,8 @@ Bundler.require(*Rails.groups)
 
 module Rails61
   class Application < Rails::Application
+    ::ActiveRecord::Base.logger = nil
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
 
