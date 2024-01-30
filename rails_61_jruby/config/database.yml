@@ -2,7 +2,7 @@ defaults: &defaults
   host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
   adapter: postgresql
   encoding: utf8
-  database: postgres
+  database: <%= ENV.fetch("DATABASE", "postgres") %>
   username: <%= ENV.fetch("POSTGRES_USER","postgres") %>
   password: <%= ENV.fetch("POSTGRES_PASSWORD",nil) %>
   reconnect: false
@@ -12,8 +12,8 @@ defaults: &defaults
   pool: 45
   properties:
     prepareThreshold: 0
-    databaseMetadataCacheFieldsMiB: 0
-  idle_timeout: 1
+    databaseMetadataCacheFieldsMiB: <%= ENV.fetch("DB_METADATA_CACHE_FIELDS_MIB","0") %>
+  idle_timeout: <%= ENV.fetch("IDLE_TIMEOUT","300") %>
 
 development:
   primary:

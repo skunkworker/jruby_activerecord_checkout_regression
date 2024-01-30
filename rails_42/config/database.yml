@@ -3,7 +3,7 @@
     host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
     adapter: postgresql
     encoding: utf8
-    database: rails_switcher_<%= Rails.env.downcase.try(:strip) %>
+    database: <%= ENV.fetch("DATABASE", "postgres") %>
     username: postgres
     password:
     reconnect: false
@@ -15,4 +15,3 @@
 
   test:
     <<: *defaults
-    database: postgres
