@@ -1,7 +1,18 @@
 NUMBER_OF_POOLS = ENV["NUMBER_OF_POOLS"]&.to_i || 1
 LOOPS = ENV["LOOPS"]&.to_i || 100
 RUNS_PER_LOOP = ENV["RUNS_PER_LOOP"]&.to_i || 20
+SCHEMA_COUNT = ENV["SCHEMA_COUNT"]&.to_i || 100
 @pools = []
+
+def schema_names
+  if SCHEMA_COUNT == 1
+    ["public"]
+  else
+    @schema_names ||= begin
+      SCHEMA_COUNT.times.collect{|x| "schema_#{x}"}
+    end
+  end
+end
 
 def run_benchmark
   start = Time.now
@@ -11,12 +22,13 @@ def run_benchmark
     conns = []
     RUNS_PER_LOOP.times do
       conn = pool.checkout
+      conn.execute("set search_path = #{schema}")
       conn.execute("select 1=1")
       conns << conn
     end
     conns.each{|c| pool.checkin(c)}
   end
-  puts "took #{(Time.now-start).round(2)} to run #{LOOPS*RUNS_PER_LOOP} times against #{ENV.fetch('DATABASE', 'postgres')}"
+  puts "LOOPS=#{LOOPS} - took #{(Time.now-start).round(2)} to run #{LOOPS*RUNS_PER_LOOP} times against #{ENV.fetch('DATABASE', 'postgres')}"
 end
 
 def run_benchmark_with_find
@@ -26,11 +38,13 @@ def run_benchmark_with_find
 
     RUNS_PER_LOOP.times do
       pool.with_connection do
+        schema = schema_names.sample
+        ::ActiveRecord::Base.connection.execute("set search_path = #{schema}")
         ::Thing.first
       end
     end
   end
-  puts "took #{(Time.now-start).round(2)} to run #{LOOPS*RUNS_PER_LOOP} times against #{ENV.fetch('DATABASE', 'postgres')}"
+  puts "LOOPS=#{LOOPS} - took #{(Time.now-start).round(2)} to run #{LOOPS*RUNS_PER_LOOP} times against #{ENV.fetch('DATABASE', 'postgres')}"
 end
 
 # https://api.rubyonrails.org/v6.1/classes/ActiveRecord/ConnectionAdapters/ConnectionPool.html

@@ -18,6 +18,7 @@ NOTE: There is an interesting performance hit observed when using `log_level=:de
 | `RUNS_PER_LOOP` | 10 | the number of connection calls for the selected pool |
 | `LOOPS` | 10-10000 | The number of loops ran, each loop selects one pool |
 | `NUMBER_OF_POOLS` | 5 | The number of database pools to create | 
+| `SCHEMA_COUNT` | 1-1000 | Sets the number of schemas to use (generated from `generate_largedb_schema.rb`) |
 
 # How to run
 
@@ -31,58 +32,67 @@ Postgresql 13.13
 JDK-17
 ```
 
+Variables
+
+```
+export DATABASE="largedb";
+export RUNS_PER_LOOP=10;
+export NUMBER_OF_POOLS=5;
+export SCHEMA_COUNT=1000;
+```
+
 ### JRuby -  Rails 4.2 
 | Run count | Time |
 | --- | --- |
-| 1000 | 2.94 |
-| 5000 | 8.71 |
-| 10000 | 9.23 |
-| 20000 | 14.13 |
+| 1000 | 4.09 |
+| 5000 | 7.11 |
+| 10000 | 9.68 |
+| 20000 | 14.0 |
 
-### JRuby -  Rails 6.1 with `databaseMetadataCacheFieldsMiB=0`
+### JRuby -  Rails 6.1 with `databaseMetadataCacheFieldsMiB=2`
 | Run count | Time |
 | --- | --- |
-| 1000 | 18.39 |
-| 5000 | 86.0 |
-| 10000 | 172.79 |
-| 20000 | 328.26 |
+| 1000 | 21.54 |
+| 5000 | 103.09 |
+| 10000 | 201.32 |
+| 20000 | 356.61 |
+
+### JRuby - Rails 6.1 with `databaseMetadataCacheFieldsMiB=0`
+| Run count | Time |
+| --- | --- |
+| 1000 | 22.37 |
+| 5000 | 104.77 |
+| 10000 | 200.07 |
+| 20000 | 399.97 |
 
 ### JRuby - Rails 6.1 with `databaseMetadataCacheFieldsMiB=5`
 | Run count | Time |
 | --- | --- |
-| 1000 | 4.95 |
-| 5000 | 17.74 |
-| 10000 | 29.07 |
-| 20000 | 58.48 |
-
-### JRuby - Rails 6.1 with `databaseMetadataCacheFieldsMiB=1`
-| Run count | Time |
-| --- | --- |
-| 1000 | 5.12 |
-| 5000 | 18.29 |
-| 10000 | 28.59 |
-| 20000 | 43.98 |
+| 1000 | 17.56 |
+| 5000 | 74.41 |
+| 10000 | 147.27 |
+| 20000 | 281.73 |
 
 ### Ruby 2.7.8 - Rails 6.1
 | Run count | Time |
 | --- | --- |
-| 1000 | 2.58 |
-| 5000 | 7.32 |
-| 10000 | 15.05 |
-| 20000 | 54.13 |
+| 1000 | 3.14 |
+| 5000 | 17.3 |
+| 10000 | 32.28 |
+| 20000 | 66.52 |
 
 ### Ruby 3.1.4 - Rails 6.1
 | Run count | Time |
 | --- | --- |
-| 1000 | 1.12 |
-| 5000 | 7.99 |
-| 10000 | 18.95 |
-| 20000 | 38.07 |
+| 1000 | 2.7 |
+| 5000 | 14.44 |
+| 10000 | 29.42 |
+| 20000 | 58.74 |
 
 ### Ruby 3.3.0 - Rails 6.1
 | Run count | Time |
 | --- | --- |
-| 1000 | 1.76 |
-| 5000 | 8.6 |
-| 10000 | 18.26 |
-| 20000 | 38.64 |
+| 1000 | 2.61 |
+| 5000 | 13.92 |
+| 10000 | 29.0 |
+| 20000 | 60.04 |

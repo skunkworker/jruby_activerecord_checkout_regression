@@ -11,6 +11,7 @@ export IDLE_TIMEOUT=100;
 export DATABASE="largedb";
 export RUNS_PER_LOOP=10;
 export NUMBER_OF_POOLS=5;
+export SCHEMA_COUNT=1000;
 
 # Generate the test database
 psql -c "drop database if exists $DATABASE;"
@@ -21,7 +22,7 @@ psql $DATABASE < largedb-schema.sql;
 loops=(100 500 1000 2000) # add 10000 for a much longer run
 log_levels=(info)
 
-printf "\n***** Running with variables:\n RUNS_PER_LOOP=$RUNS_PER_LOOP, NUMBER_OF_POOLS=$NUMBER_OF_POOLS, DATABASE=$DATABASE, IDLE_TIMEOUT=$IDLE_TIMEOUT, loops=${loops[*]}, log_levels=${log_levels[*]}"
+printf "\n***** Running with variables:\n RUNS_PER_LOOP=$RUNS_PER_LOOP, NUMBER_OF_POOLS=$NUMBER_OF_POOLS, DATABASE=$DATABASE, IDLE_TIMEOUT=$IDLE_TIMEOUT, SCHEMA_COUNT=$SCHEMA_COUNT, loops=${loops[*]}, log_levels=${log_levels[*]}"
 
 (
   cd rails_42;
@@ -37,6 +38,23 @@ printf "\n***** Running with variables:\n RUNS_PER_LOOP=$RUNS_PER_LOOP, NUMBER_O
     done;
   done;
 )
+
+(
+  cd rails_61_jruby;
+  printf "\nRunning rails 6.1 with jruby-9.3.13.0 with DB_METADATA_CACHE_FIELDS_MIB=2 \n"
+  export DB_METADATA_CACHE_FIELDS_MIB="2";
+
+  for log_level in "${log_levels[@]}"
+  do
+    export LOG_LEVEL=$log_level;
+    echo "log_level=$log_level"
+    for value in "${loops[@]}"
+    do
+      LOOPS=$value rails runner ../bench.rb;
+    done;
+  done;
+)
+
 
 (
   cd rails_61_jruby;
@@ -70,21 +88,6 @@ printf "\n***** Running with variables:\n RUNS_PER_LOOP=$RUNS_PER_LOOP, NUMBER_O
   done;
 )
 
-(
-  cd rails_61_jruby;
-  printf "\nRunning rails 6.1 with jruby-9.3.13.0 with DB_METADATA_CACHE_FIELDS_MIB=1 \n"
-  export DB_METADATA_CACHE_FIELDS_MIB="1";
-
-  for log_level in "${log_levels[@]}"
-  do
-    export LOG_LEVEL=$log_level;
-    echo "log_level=$log_level"
-    for value in "${loops[@]}"
-    do
-      LOOPS=$value rails runner ../bench.rb;
-    done;
-  done;
-)
 
 (
   cd rails_61_278;

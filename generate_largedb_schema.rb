@@ -1,4 +1,5 @@
 NUMBER_OF_TABLES = 15
+NUMBER_OF_SCHEMAS = 1000
 SCHEMA_FILENAME = "largedb-schema.sql"
 
 @generate_column_lambdas = [
@@ -27,5 +28,21 @@ end
     table_name = "table#{i}"
     file.write(create_table(table_name, 100))
     file.write("\n")
+  end
+
+  NUMBER_OF_SCHEMAS.times do |x|
+    schema_name = "schema_#{x}"
+
+    file.write("CREATE SCHEMA IF NOT EXISTS #{schema_name};\n")
+
+    table_name = "#{schema_name}.things"
+    file.write(create_table(table_name, 200))
+    file.write("\n")
+
+    NUMBER_OF_TABLES.times do |i|
+      table_name = "#{schema_name}.table#{i}"
+      file.write(create_table(table_name, 100))
+      file.write("\n")
+    end
   end
 end
